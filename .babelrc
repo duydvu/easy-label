@@ -1,0 +1,13 @@
+{
+    "compact": false,
+    "presets": [
+        "env",
+        "react"
+    ],
+    "plugins": [
+        "transform-object-rest-spread",
+        "syntax-dynamic-import",
+        "react-loadable/babel",
+        "babel-plugin-styled-components"
+    ]
+}

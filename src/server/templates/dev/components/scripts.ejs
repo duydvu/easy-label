@@ -1,0 +1,16 @@
+<script>
+    window.__PRELOADED_STATE__ = <%-JSON.stringify(data.preloadedState).replace(/</g, '\\u003c')%>
+</script>
+<script src="/js/font-loader.js"></script>
+<script src="/js/react.development.js"></script>
+<script src="/js/react-dom.development.js"></script>
+<script src="/webpack-dev-server.js"></script>
+<%-
+    data.bundles.map(function(bundle) {
+        if(!bundle.file.match(/.+map$/))
+        return `<script src="/build/${bundle.file}"></script>`;
+        else
+        return '';
+    }).join('\n')
+%>
+<script src="/build/main.bundle.js"></script>
