@@ -17,3 +17,6 @@ dist/compilation-stats.json
 # Logs
 logs/*
 !logs/.gitkeep
+
+# Data
+data.csv
