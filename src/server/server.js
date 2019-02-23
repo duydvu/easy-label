@@ -9,9 +9,9 @@ const app = express();
 const PORT = config.PORT || 3000;
 
 app.use(express.static(path.join(__dirname, '../static')));
-app.set('views', path.join(__dirname, '../src/server/templates/dev'));
+app.set('views', path.join(__dirname, '../src/server/templates'));
 if (process.env.NODE_ENV === 'production') {
-    app.set('views', path.join(__dirname, 'templates/dev'));
+    app.set('views', path.join(__dirname, 'templates'));
 }
 
 app.set('view engine', 'ejs');
