@@ -4,19 +4,20 @@
   "description": "Rezo's boilerplate that uses React.js, SASS, Node.js and Express.js",
   "scripts": {
     "start": "node scripts/start.js",
-    "dev-client": "node src/server/dummy/index.js & webpack-dev-server",
-    "new-component": "node scripts/new-component",
+    "lint": "node scripts/lint.js",
+    "test": "jest --config ./configs/jest.config.js",
     "build": "node scripts/build.js",
     "node": "node scripts/node.js",
-    "lint": "eslint --config ./configs/.eslintrc.js --ignore-path ./configs/.eslintignore --ext .jsx,.js src",
-    "test": "jest --config ./configs/jest.config.js"
+    "new-component": "node scripts/new-component"
   },
   "license": "GPL-3.0",
   "dependencies": {
     "async": "^2.6.0",
     "axios": "^0.16.2",
     "chalk": "^2.4.1",
+    "ejs": "^2.6.1",
     "express": "^4.16.3",
+    "lodash": "^4.17.11",
     "prop-types": "^15.6.2",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
