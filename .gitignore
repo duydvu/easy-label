@@ -21,3 +21,7 @@ logs/*
 
 # Data
 data.csv
+
+# Python
+__pycache__
+*.pyc
