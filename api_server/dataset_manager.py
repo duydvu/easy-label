@@ -10,13 +10,13 @@ class DatasetManager:
         self.database = self.client[database]
         self.collection = self.database[collection]
 
-    def getDatabase(self):
+    def get_database(self):
         return self.databaseName
 
-    def getCollection(self):
+    def get_collection(self):
         return self.collectionName
 
-    def getMetadata(self):
+    def get_metadata(self):
         collectionCount = self.collection.count()
         print(collectionCount)
         keys = list(self.collection.find_one().keys())
@@ -25,10 +25,10 @@ class DatasetManager:
             'keys': keys
         }
 
-    def findByIndex(self, index):
+    def find_by_index(self, index):
         return self.collection.find_one({'index': index})
 
-    def insertFromJSONFile(self, filename):
+    def insert_from_JSON_file(self, filename):
         try:
             dataset = json.load(open(filename))
         except:
@@ -40,5 +40,5 @@ class DatasetManager:
     def insert(self, document):
         self.collection.insert_one(document)
 
-    def updateByIndex(self, index, document):
+    def update_by_index(self, index, document):
         self.collection.find_one_and_replace({ 'index': index }, document)

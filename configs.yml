@@ -1,1 +1,4 @@
-data_file: data.csv
+data_file: data.json
+type: classification
+labels:
+    - spam: boolean
