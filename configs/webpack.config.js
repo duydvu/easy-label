@@ -49,7 +49,7 @@ if (TARGET !== 'build') {
             // This makes everything reloaded when you change files
             new webpack.HotModuleReplacementPlugin(),
             new webpack.DefinePlugin({
-                API_URL: JSON.stringify(constants.LOCALHOST),
+                API_URL: JSON.stringify(config.API_URL),
             }),
         ],
 

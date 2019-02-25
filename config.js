@@ -6,5 +6,5 @@ module.exports = {
     // The port used by Webpack Dev Server
     WEBPACK_PORT: 8080,
     // The API url, could be the host IP, domain name of the web server or a small service
-    API_URL: '',
+    API_URL: 'http://localhost:3001',
 };

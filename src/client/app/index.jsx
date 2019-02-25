@@ -1,10 +1,10 @@
-// import React
 import React from 'react';
 import { render } from 'react-dom';
 import {
     BrowserRouter as Router,
 } from 'react-router-dom';
 import { createStore } from 'redux';
+import { Provider } from 'react-redux';
 import Loadable from 'react-loadable';
 
 import App from './components/App';
@@ -24,7 +24,9 @@ const supportsHistory = 'pushState' in window.history;
 Loadable.preloadReady().then(() => {
     render(
         <Router forceRefresh={!supportsHistory}>
-            <App store={store} />
+            <Provider store={store}>
+                <App />
+            </Provider>
         </Router>,
         document.getElementById('root'),
     );
