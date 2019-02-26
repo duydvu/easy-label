@@ -1,4 +1,4 @@
-from flask import Flask, Blueprint, request
+from flask import Flask, Blueprint, request, abort
 from flask_cors import CORS, cross_origin
 from api_server.dataset_manager import DatasetManager
 from api_server.config_parser import ConfigParser
@@ -25,8 +25,12 @@ def get_data(index):
 @BLUE_PRINT.route('/data/<index>', methods=['PUT'])
 def put_data(index):
     document = request.get_json()
-    print(document)
-    return dumps(DATASET_MANAGER.update_by_index(int(index), document))
+    if len(document.keys()) is 0:
+        return abort(400)
+    if DATASET_MANAGER.update_by_index(int(index), document):
+        return dumps({})
+    else:
+        abort(400)
 
 
 def create_app():

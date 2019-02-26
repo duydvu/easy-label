@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import PropTypes from 'prop-types';
 
 const LabelHeader = styled.div`
-    background-color: lime;
+    background-color: darkgray;
     line-height: 40px;
     color: white;
     text-indent: 10px;
@@ -20,8 +20,12 @@ const LabelButton = styled.button`
     border: none;
     margin: 20px 20px 0 20px;
     height: 40px;
+    border-radius: 5px;
+    box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.3);
+    transition: 0.2s ease-in-out;
     &:hover {
         background-color: #eeeeee;
+        box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.4);
     }
     &:active {
         background-color: #dddddd;

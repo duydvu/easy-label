@@ -27,7 +27,7 @@ const Navigation = styled.div`
     padding: 10px;
     z-index: 100;
     background: white;
-    box-shadow: 0px 2px 9px rgba(0, 0, 0, 0.4);
+    border-bottom: 1px solid darkgray;
 `;
 
 const Button = styled.button`
@@ -70,6 +70,11 @@ const Column = styled.div`
     }
 `;
 
+const Error = styled.div`
+    color: red;
+    font-weight: 700;
+`;
+
 export default class App extends React.Component {
     constructor(props) {
         super(props);
@@ -86,6 +91,8 @@ export default class App extends React.Component {
             columns: [],
             labels: [],
             values: [],
+            changed: false,
+            error: false,
         };
 
         this.urls = [
@@ -93,19 +100,28 @@ export default class App extends React.Component {
             () => '/metadata',
         ];
 
+        this.previousButton = React.createRef();
+        this.nextButton = React.createRef();
+
         this.changeDocument = this.changeDocument.bind(this);
     }
 
     componentDidMount() {
         const { index } = this.state;
         Promise.all(this.urls.map(url => fetch(`${API_URL}${url(index)}`).then(res => res.json())))
-            .then((data) => {
+            .then(([document, { database, labels }]) => {
                 window.history.replaceState({ index }, `Document #${index}`, `/?i=${index}`);
+                console.log();
                 this.setState({
-                    document: data[0],
-                    total: data[1].database.count,
-                    columns: data[1].database.keys.filter(e => e !== '_id' && e !== 'index'),
-                    labels: data[1].labels,
+                    document,
+                    total: database.count,
+                    columns: database.keys.filter(e => (
+                        e !== '_id'
+                        && e !== 'index'
+                        && !labels.map(l => l.name).includes(e)
+                    )),
+                    labels,
+                    values: labels.map(e => document[e.name]),
                 });
             });
 
@@ -119,16 +135,58 @@ export default class App extends React.Component {
                 });
             }
         };
+
+        document.onkeydown = (event) => {
+            const { keyCode } = event;
+            switch (keyCode) {
+                case 37:
+                    this.previousButton.current.click();
+                    break;
+                case 39:
+                    this.nextButton.current.click();
+                    break;
+                default:
+            }
+        };
     }
 
     changeDocument(index, replace = false) {
         if (index < 0) return;
+        if (this.state.changed) {
+            const keys = Object.keys(this.state.values);
+            const body = {};
+            keys.forEach((k) => {
+                body[this.state.labels[k].name] = this.state.values[k];
+            });
+            fetch(`${API_URL}${this.urls[0](this.state.index)}`, {
+                method: 'PUT',
+                body: JSON.stringify(body),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+                .then(res => res.json())
+                .then(() => {})
+                .catch(() => {
+                    this.setState({
+                        error: 'Save document failed.',
+                    });
+                });
+        }
         fetch(`${API_URL}${this.urls[0](index)}`).then(res => res.json())
             .then((document) => {
                 window.history[replace ? 'replaceState' : 'pushState']({ index }, `Document #${index}`, `/?i=${index}`);
-                this.setState({
+                this.setState(prevState => ({
                     document,
                     index,
+                    values: prevState.labels.map(e => document[e.name]),
+                    changed: false,
+                    error: false,
+                }));
+            })
+            .catch(() => {
+                this.setState({
+                    error: 'Cannot get the new document.',
                 });
             });
     }
@@ -141,6 +199,7 @@ export default class App extends React.Component {
             columns,
             labels,
             values,
+            error,
         } = this.state;
         if (!document) {
             return (
@@ -149,14 +208,29 @@ export default class App extends React.Component {
                 </div>
             );
         }
+
+        if (error) {
+            return (
+                <Error>
+                    {error}
+                </Error>
+            );
+        }
+
         return (
             <AppContainer>
                 <Navigation>
-                    <Button onClick={() => this.changeDocument(index - 1)}>
+                    <Button
+                        onClick={() => this.changeDocument(index - 1)}
+                        ref={this.previousButton}
+                    >
                         previous
                     </Button>
                     <div>{`${index} / ${total}`}</div>
-                    <Button onClick={() => this.changeDocument(index + 1)}>
+                    <Button
+                        onClick={() => this.changeDocument(index + 1)}
+                        ref={this.nextButton}
+                    >
                         next
                     </Button>
                 </Navigation>
@@ -174,6 +248,7 @@ export default class App extends React.Component {
                                         prevValues[i] = value;
                                         return {
                                             values: prevValues,
+                                            changed: true,
                                         };
                                     });
                                 }}

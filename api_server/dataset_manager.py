@@ -41,4 +41,9 @@ class DatasetManager:
         self.collection.insert_one(document)
 
     def update_by_index(self, index, document):
-        self.collection.find_one_and_replace({ 'index': index }, document)
+        try:
+            self.collection.find_one_and_update({ 'index': index }, {'$set': document})
+            return True
+        except Exception as e:
+            print(e)
+            return False
