@@ -31,7 +31,7 @@ const LabelButton = styled.button`
         background-color: #dddddd;
     }
     &.active {
-        background-color: crimson;
+        background-color: #FF0266;
         color: white;
     }
 `;

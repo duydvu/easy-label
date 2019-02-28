@@ -1,5 +1,7 @@
 from pymongo import MongoClient
+from bson.json_util import dumps
 import json
+from io import StringIO
 
 class DatasetManager:
     def __init__(self, host='localhost', database='easy-label', collection='dataset'):
@@ -47,3 +49,14 @@ class DatasetManager:
         except Exception as e:
             print(e)
             return False
+
+    def get_labelled_data(self, labels):
+        query_object = {}
+        for label in labels:
+            if label['type'] == 'boolean':
+                query_object[label['name']] = {
+                    '$in': [True, False]
+                }
+        labelled_documents = list(self.collection.find(query_object, { '_id': 0 }))
+        strIO = StringIO(json.dumps(labelled_documents, ensure_ascii=False))
+        return strIO

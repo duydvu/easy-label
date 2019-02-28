@@ -1,4 +1,4 @@
-from flask import Flask, Blueprint, request, abort
+from flask import Flask, Blueprint, request, abort, Response
 from flask_cors import CORS, cross_origin
 from api_server.dataset_manager import DatasetManager
 from api_server.config_parser import ConfigParser
@@ -32,6 +32,15 @@ def put_data(index):
     else:
         abort(400)
 
+
+@BLUE_PRINT.route('/download/labelled', methods=['GET'])
+def get_labelled():
+    labels = CONFIG_PARSER.get_labels()
+    labelled_data = DATASET_MANAGER.get_labelled_data(labels).getvalue()
+    return Response(labelled_data,
+                    mimetype='application/json',
+                    headers={"Content-Disposition":
+                             "attachment;filename=data.json"})
 
 def create_app():
     app = Flask(__name__)
