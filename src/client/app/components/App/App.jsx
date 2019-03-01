@@ -3,63 +3,9 @@ import styled from 'styled-components';
 import queryString from 'query-string';
 
 import LabelsCollection from '../LabelsCollection';
+import Navigation from '../Navigation';
 
-const AppContainer = styled.div`
-    &, * {
-        font-family: 'Roboto', sans-serif;
-        font-weight: 400;
-    }
-
-    .bold {
-        font-weight: 700;
-    }
-`;
-
-const Navigation = styled.div`
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 60px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 10px;
-    z-index: 100;
-    background: white;
-    box-shadow: 0 2px 4px rgba(0,0,0,.5);
-    box-sizing: border-box;
-`;
-
-const Button = styled.button`
-    margin: 10px;
-    min-width: 100px;
-    height: 40px;
-    cursor: pointer;
-    font-weight: 700;
-    border-radius: 5px;
-`;
-
-const Input = styled.input`
-    width: 50px;
-    font-size: 16px;
-    text-align: right;
-    margin-right: 5px;
-`;
-
-const DownloadButton = styled.a`
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    line-height: 40px;
-    width: 100px;
-    background: #6200EE;
-    font-weight: 700;
-    text-align: center;
-    border-radius: 5px;
-    color: white;
-    text-decoration: none;
-`;
+const AppContainer = styled.div``;
 
 const LabelSection = styled.div`
     position: fixed;
@@ -79,18 +25,18 @@ const Row = styled.div`
 `;
 
 const Column = styled.div`
+    text-indent: 10px;
     &.header {
         font-weight: 700;
         color: white;
-        background: cyan;
-        padding: 10px;
+        background: #202124;
+        line-height: 40px;
         &::first-letter {
             text-transform: capitalize;
         }
     }
     &.content {
         padding: 10px;
-        text-indent: 10px;
         font-size: 14px;
         line-height: 20px;
     }
@@ -129,7 +75,7 @@ export default class App extends React.Component {
         this.previousButton = React.createRef();
         this.nextButton = React.createRef();
 
-        this.changeDocument = this.changeDocument.bind(this);
+        this.updateData = this.updateData.bind(this);
     }
 
     componentDidMount() {
@@ -157,7 +103,7 @@ export default class App extends React.Component {
                 this.setState({
                     index: state.index,
                 }, () => {
-                    this.changeDocument(this.state.index, true);
+                    this.updateData(this.state.index, true);
                 });
             }
         };
@@ -176,7 +122,7 @@ export default class App extends React.Component {
         };
     }
 
-    changeDocument(index, replace = false) {
+    updateData(index, replace = false) {
         if (index < 0) return;
         if (this.state.changed) {
             const keys = Object.keys(this.state.values);
@@ -201,6 +147,12 @@ export default class App extends React.Component {
         }
         fetch(`${API_URL}${this.urls[0](index)}`).then(res => res.json())
             .then((document) => {
+                if (!document) {
+                    this.setState({
+                        error: 'Cannot get the new document.',
+                    });
+                    return;
+                }
                 window.history[replace ? 'replaceState' : 'pushState']({ index }, `Document #${index}`, `/?i=${index}`);
                 this.setState(prevState => ({
                     document,
@@ -227,6 +179,7 @@ export default class App extends React.Component {
             values,
             error,
         } = this.state;
+
         if (!document) {
             return (
                 <div>
@@ -235,46 +188,16 @@ export default class App extends React.Component {
             );
         }
 
-        if (error) {
-            return (
-                <Error>
-                    {error}
-                </Error>
-            );
-        }
-
         return (
             <AppContainer>
-                <Navigation>
-                    <Button
-                        onClick={() => this.changeDocument(index - 1)}
-                        ref={this.previousButton}
-                    >
-                        Previous
-                    </Button>
-                    <div>
-                        <Input
-                            type="text"
-                            value={index}
-                            onKeyUp={(e) => {
-                                if (e.keyCode === 13) {
-                                    this.changeDocument(index);
-                                }
-                            }}
-                            onChange={e => this.setState({ index: parseInt(e.target.value, 0) })}
-                        />
-                        {`/ ${total}`}
-                    </div>
-                    <Button
-                        onClick={() => this.changeDocument(index + 1)}
-                        ref={this.nextButton}
-                    >
-                        Next
-                    </Button>
-                    <DownloadButton href={`${API_URL}/download/labelled`}>
-                        Download
-                    </DownloadButton>
-                </Navigation>
+                <Navigation
+                    onUpdateData={this.updateData}
+                    onIndexChange={e => this.setState({ index: parseInt(e.target.value, 0) })}
+                    index={index}
+                    total={total}
+                    previousButton={this.previousButton}
+                    nextButton={this.nextButton}
+                />
                 <LabelSection>
                     {
                         labels.map((e, i) => (
@@ -299,12 +222,17 @@ export default class App extends React.Component {
                 </LabelSection>
                 <Table>
                     {
-                        columns.map(e => (
-                            <Row key={e}>
-                                <Column className="header">{e}</Column>
-                                <Column className="content">{document[e]}</Column>
-                            </Row>
-                        ))
+                        error ? (
+                            <Error>
+                                {error}
+                            </Error>
+                        )
+                            : columns.map(e => (
+                                <Row key={e}>
+                                    <Column className="header">{e}</Column>
+                                    <Column className="content">{document[e]}</Column>
+                                </Row>
+                            ))
                     }
                 </Table>
             </AppContainer>

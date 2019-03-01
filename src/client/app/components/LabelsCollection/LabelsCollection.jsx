@@ -2,8 +2,10 @@ import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 
+import Button from '../Button';
+
 const LabelHeader = styled.div`
-    background-color: darkgray;
+    background-color: #202124;
     line-height: 40px;
     color: white;
     text-indent: 10px;
@@ -12,15 +14,12 @@ const LabelHeader = styled.div`
     }
 `;
 
-const LabelButton = styled.button`
+const LabelButton = styled(Button)`
     width: 110px;
-    cursor: pointer;
     background-color: white;
     color: black;
-    border: none;
     margin: 20px 20px 0 20px;
     height: 40px;
-    border-radius: 5px;
     box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.3);
     transition: 0.2s ease-in-out;
     &:hover {

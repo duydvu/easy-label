@@ -7,6 +7,7 @@ import { createStore } from 'redux';
 import { Provider } from 'react-redux';
 import Loadable from 'react-loadable';
 
+import GlobalStyle from './components/GlobalStyle';
 import App from './components/App';
 
 // Reducer
@@ -25,7 +26,10 @@ Loadable.preloadReady().then(() => {
     render(
         <Router forceRefresh={!supportsHistory}>
             <Provider store={store}>
-                <App />
+                <React.Fragment>
+                    <GlobalStyle />
+                    <App />
+                </React.Fragment>
             </Provider>
         </Router>,
         document.getElementById('root'),
