@@ -132,7 +132,7 @@ export default class App extends React.Component {
         };
 
         // Keyboard binding
-        document.onkeydown = (event) => {
+        window.onkeydown = (event) => {
             const { keyCode } = event;
             switch (keyCode) {
                 // Left arrow key
@@ -149,7 +149,7 @@ export default class App extends React.Component {
     }
 
     updateData(index, replace = false) {
-        if (index < 0) return;
+        if (index < 0 || typeof index !== 'number') return;
         if (this.state.changed) {
             const keys = Object.keys(this.state.values);
             const body = {};
@@ -241,7 +241,7 @@ export default class App extends React.Component {
                 <Navigation
                     onUpdateData={this.updateData}
                     onUpload={file => this.uploadData(file)}
-                    onIndexChange={e => this.setState({ index: parseInt(e.target.value, 0) })}
+                    onIndexChange={e => this.setState({ index: parseInt(e.target.value, 0) || '' })}
                     index={index}
                     total={total}
                     previousButton={this.previousButton}

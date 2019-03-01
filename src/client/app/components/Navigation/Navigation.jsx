@@ -91,7 +91,8 @@ export default function Navigation(props) {
                     <Input
                         type="text"
                         value={index}
-                        onKeyUp={(e) => {
+                        onKeyDown={(e) => {
+                            e.stopPropagation();
                             if (e.keyCode === 13) {
                                 e.target.blur();
                                 onUpdateData(index);
