@@ -36,11 +36,13 @@ def put_data(index):
 @BLUE_PRINT.route('/download/labelled', methods=['GET'])
 def get_labelled():
     labels = CONFIG_PARSER.get_labels()
-    labelled_data = DATASET_MANAGER.get_labelled_data(labels).getvalue()
+    labelled_data = DATASET_MANAGER.get_labelled_data(labels)
     return Response(labelled_data,
                     mimetype='application/json',
-                    headers={"Content-Disposition":
-                             "attachment;filename=data.json"})
+                    headers={
+                        'Content-Disposition':
+                        'attachment;filename=data.json'
+                    })
 
 def create_app():
     app = Flask(__name__)
