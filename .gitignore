@@ -25,3 +25,6 @@ data.csv
 # Python
 __pycache__
 *.pyc
+
+# Dataset
+data*
