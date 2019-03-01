@@ -8,6 +8,7 @@ const Button = styled.button`
     color: #FFFFFF;
     cursor: pointer;
     outline-color: ${props => (props.secondary ? '#6200EE' : '#FF0266')};
+    padding: 0;
 `;
 
 export default Button;

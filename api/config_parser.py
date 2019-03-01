@@ -15,9 +15,11 @@ class ConfigParser:
     def get_data_file(self):
         return self.config['data_file']
 
-    def get_labels(self):
+    def get_labels(self, onlyName=False):
         labels = self.config['labels']
         nameList = [list(label.keys())[0] for label in labels]
+        if onlyName:
+            return nameList
         typeList = [label[name] for label, name in zip(labels, nameList)]
         return list(map(lambda x: {
             'name': x[0],
