@@ -8,7 +8,9 @@ import chalk from 'chalk';
 import express from 'express'; /* eslint no-unused-vars: "off" */
 
 /* eslint-disable import/no-unresolved */
-import state from 'reducers';
+import {
+    state,
+} from 'reducers';
 import App from 'components/App';
 /* eslint-enable import/no-unresolved */
 

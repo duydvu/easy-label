@@ -17,6 +17,7 @@ module.exports = {
             "allow": [
                 "__PRELOADED_STATE__",
                 "__REDUX_DEVTOOLS_EXTENSION__",
+                "__REDUX_DEVTOOLS_EXTENSION_COMPOSE__",
                 "_id",
             ]
         }],
