@@ -18,6 +18,7 @@
     "csvtojson": "^2.0.8",
     "ejs": "^2.6.1",
     "express": "^4.16.3",
+    "idb": "^3.0.2",
     "lodash": "^4.17.11",
     "prop-types": "^15.6.2",
     "query-string": "^6.2.0",

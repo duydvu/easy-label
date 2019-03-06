@@ -1,9 +1,15 @@
 import React from 'react';
 import styled from 'styled-components';
 import queryString from 'query-string';
+import { connect } from 'react-redux';
+import { openDb } from 'idb';
 
 import LabelsCollection from '../LabelsCollection';
 import Navigation from '../Navigation';
+import {
+    addOneLog,
+    addMulLogs,
+} from '../../redux/action';
 
 const AppContainer = styled.div`
     padding-top: 60px;
@@ -49,7 +55,7 @@ const ErrorContainer = styled.div`
     font-weight: 700;
 `;
 
-export default class App extends React.Component {
+class App extends React.Component {
     constructor(props) {
         super(props);
 
@@ -146,17 +152,38 @@ export default class App extends React.Component {
                 default:
             }
         };
+
+        // Get logs from indexedDB
+        if (!('indexedDB' in window)) {
+            console.log('This browser doesn\'t support IndexedDB');
+            return;
+        }
+        this.dbPromise = openDb('action-logs', 1, (upgradeDb) => {
+            if (!upgradeDb.objectStoreNames.contains('logs')) {
+                upgradeDb.createObjectStore('logs', { keyPath: 'id', autoIncrement: true });
+            }
+        });
+        this.dbPromise.then((db) => {
+            const tx = db.transaction('logs', 'readonly');
+            const logsOS = tx.objectStore('logs');
+            return logsOS.getAll();
+        })
+            .then((logs) => {
+                this.props.addMulLogs(logs);
+            });
     }
 
     updateData(index, replace = false) {
         if (index < 0 || typeof index !== 'number') return;
         if (this.state.changed) {
+            // Save changes
             const keys = Object.keys(this.state.values);
             const body = {};
+            const saveIndex = this.state.index;
             keys.forEach((k) => {
                 body[this.state.labels[k].name] = this.state.values[k];
             });
-            fetch(`${API_URL}${this.urls[0](this.state.index)}`, {
+            fetch(`${API_URL}${this.urls[0](saveIndex)}`, {
                 method: 'PUT',
                 body: JSON.stringify(body),
                 headers: {
@@ -164,7 +191,24 @@ export default class App extends React.Component {
                 },
             })
                 .then(res => res.json())
-                .then(() => {})
+                .then(() => {
+                    const logObj = {
+                        action: 'UPDATE_DATA',
+                        detail: {
+                            index: saveIndex,
+                            data: body,
+                        },
+                    };
+                    this.dbPromise.then((db) => {
+                        const tx = db.transaction('logs', 'readwrite');
+                        const logsOS = tx.objectStore('logs');
+                        logsOS.add(logObj);
+                        return tx.complete;
+                    })
+                        .then(() => {
+                            this.props.addOneLog(logObj);
+                        });
+                })
                 .catch(() => {
                     this.setState({
                         error: {
@@ -174,6 +218,7 @@ export default class App extends React.Component {
                     });
                 });
         }
+        // Get new data
         fetch(`${API_URL}${this.urls[0](index)}`).then(res => res.json())
             .then((document) => {
                 window.history[replace ? 'replaceState' : 'pushState']({ index }, `Document #${index}`, `/?i=${index}`);
@@ -241,7 +286,11 @@ export default class App extends React.Component {
                 <Navigation
                     onUpdateData={this.updateData}
                     onUpload={file => this.uploadData(file)}
-                    onIndexChange={e => this.setState({ index: parseInt(e.target.value, 0) || '' })}
+                    onIndexChange={e => this.setState({
+                        index: Number.isNaN(parseInt(e.target.value, 0))
+                            ? '' : parseInt(e.target.value, 0),
+                    })}
+                    onCollectionChange={e => console.log(e)}
                     index={index}
                     total={total}
                     previousButton={this.previousButton}
@@ -301,3 +350,11 @@ export default class App extends React.Component {
         );
     }
 }
+
+export default connect(
+    () => ({}),
+    dispatch => ({
+        addOneLog: log => dispatch(addOneLog(log)),
+        addMulLogs: logs => dispatch(addMulLogs(logs)),
+    }),
+)(App);
