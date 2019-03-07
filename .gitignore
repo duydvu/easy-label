@@ -19,9 +19,6 @@ dist/lint-report.html
 logs/*
 !logs/.gitkeep
 
-# Data
-data.csv
-
 # Python
 __pycache__
 *.pyc
