@@ -34,8 +34,12 @@ const NavigateButton = styled(Button)`
     color: #ffffff;
     display: flex;
     justify-content: center;
+    transition: 0.2s ease-in;
     i {
         font-weight: 700;
+    }
+    &:active {
+        background: #455a64;
     }
 `;
 
@@ -60,11 +64,19 @@ const SideNavToggleButton = styled(Button)`
     height: 100%;
     padding: 10px 8px;
     box-sizing: border-box;
+    transition: 0.1s linear;
     div {
         height: 4px;
         background-color: #000000;
         border-radius: 2px;
         margin-bottom: 4px;
+        transition: inherit;
+    }
+    &:active {
+        padding: 12px 8px;
+        div {
+            margin-bottom: 2px;
+        }
     }
 `;
 

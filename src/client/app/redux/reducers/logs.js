@@ -9,13 +9,13 @@ const logs = (
     switch (action.type) {
         case ADD_ONE_LOG:
             return [
-                ...state,
                 action.log,
+                ...state,
             ];
         case ADD_MULTIPLE_LOGS:
             return [
-                ...state,
                 ...action.logs,
+                ...state,
             ];
         default:
             return state;

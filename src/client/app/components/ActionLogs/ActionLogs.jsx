@@ -39,14 +39,16 @@ function ActionLogs(props) {
                     <tr>
                         <th>Action</th>
                         <th>Index</th>
+                        <th>Date</th>
                         <th>Data</th>
                     </tr>
                     {
                         logs.map((e, i) => (
                             <tr key={i}>
                                 <td>{e.action}</td>
-                                <td>{e.detail.index}</td>
-                                <td>{JSON.stringify(e.detail.data)}</td>
+                                <td>{e.index}</td>
+                                <td>{new Date(e.date.$date).toLocaleString()}</td>
+                                <td>{JSON.stringify(e.detail)}</td>
                             </tr>
                         ))
                     }

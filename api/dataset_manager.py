@@ -1,5 +1,10 @@
 from pymongo import MongoClient
+import pymongo
 import json
+import datetime
+
+def get_logs_collection(collectionName):
+    return collectionName + '_logs'
 
 class DatasetManager:
     def __init__(self, host='localhost', database='easy-label'):
@@ -16,13 +21,15 @@ class DatasetManager:
 
     def get_metadata(self, collectionName='dataset'):
         collection = self.database[collectionName]
+        logsCollection = self.database[get_logs_collection(collectionName)]
         collectionCount = collection.count()
         keys = list(collection.find_one().keys())
         return {
             'count': collectionCount,
             'keys': keys,
             'collection': collectionName,
-            'all_collections': self.get_all_collections()
+            'all_collections': self.get_all_collections(),
+            'logs': logsCollection.find().sort('date',  direction=pymongo.DESCENDING).limit(50)
         }
 
     def find_by_index(self, index, collectionName='dataset'):
@@ -30,18 +37,28 @@ class DatasetManager:
 
     def insert_from_data(self, data, collectionName='dataset'):
         self.database.drop_collection(collectionName)
+        self.database.drop_collection(get_logs_collection(collectionName))
         dataset = json.loads(data)
         if not isinstance(dataset, list):
             return False
+        self.database[collectionName].create_index('index', unique=True)
         for index, document in enumerate(dataset):
             document['index'] = index
         return self.database[collectionName].insert_many(dataset)
 
     def update_by_index(self, index, document, collectionName='dataset'):
         try:
-            original_document = self.database[collectionName].find_one_and_update(
+            self.database[collectionName].find_one_and_update(
                 {'index': index}, {'$set': document})
-            return original_document
+            # Add log
+            log = {
+                'action': 'UPDATE_DATA',
+                'index': index,
+                'detail': document,
+                'date': datetime.datetime.utcnow()
+            }
+            self.database[get_logs_collection(collectionName)].insert_one(log)
+            return log
         except Exception as e:
             print(e)
             return False

@@ -35,8 +35,9 @@ def put_data(index):
     label_list = CONFIG_PARSER.get_labels(onlyName=True)
     if sorted(label_list) != sorted(list(document.keys())):
         return error("Bad request", 400)
-    if DATASET_MANAGER.update_by_index(int(index), document):
-        return dumps({ 'success': True })
+    log = DATASET_MANAGER.update_by_index(int(index), document)
+    if log:
+        return dumps(log)
     error("Not found", 404)
 
 
@@ -55,7 +56,6 @@ def download_labelled():
 @BLUE_PRINT.route('/upload', methods=['POST'])
 def upload_file():
     # check if the post request has the file part
-    print(request.files)
     if 'file' not in request.files:
         return error("Bad request1", 400)
     file = request.files['file']

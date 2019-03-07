@@ -2,7 +2,6 @@ import React from 'react';
 import styled from 'styled-components';
 import queryString from 'query-string';
 import { connect } from 'react-redux';
-import { openDb } from 'idb';
 
 import LabelsCollection from '../LabelsCollection';
 import Navigation from '../Navigation';
@@ -103,6 +102,7 @@ class App extends React.Component {
             })))
             .then(([document, { database, labels }]) => {
                 window.history.replaceState({ index }, `Document #${index}`, `/?i=${index}`);
+                this.props.addMulLogs(database.logs);
                 this.setState({
                     document,
                     total: database.count,
@@ -152,25 +152,6 @@ class App extends React.Component {
                 default:
             }
         };
-
-        // Get logs from indexedDB
-        if (!('indexedDB' in window)) {
-            console.log('This browser doesn\'t support IndexedDB');
-            return;
-        }
-        this.dbPromise = openDb('action-logs', 1, (upgradeDb) => {
-            if (!upgradeDb.objectStoreNames.contains('logs')) {
-                upgradeDb.createObjectStore('logs', { keyPath: 'id', autoIncrement: true });
-            }
-        });
-        this.dbPromise.then((db) => {
-            const tx = db.transaction('logs', 'readonly');
-            const logsOS = tx.objectStore('logs');
-            return logsOS.getAll();
-        })
-            .then((logs) => {
-                this.props.addMulLogs(logs);
-            });
     }
 
     updateData(index, replace = false) {
@@ -191,23 +172,8 @@ class App extends React.Component {
                 },
             })
                 .then(res => res.json())
-                .then(() => {
-                    const logObj = {
-                        action: 'UPDATE_DATA',
-                        detail: {
-                            index: saveIndex,
-                            data: body,
-                        },
-                    };
-                    this.dbPromise.then((db) => {
-                        const tx = db.transaction('logs', 'readwrite');
-                        const logsOS = tx.objectStore('logs');
-                        logsOS.add(logObj);
-                        return tx.complete;
-                    })
-                        .then(() => {
-                            this.props.addOneLog(logObj);
-                        });
+                .then((log) => {
+                    this.props.addOneLog(log);
                 })
                 .catch(() => {
                     this.setState({
