@@ -114,7 +114,7 @@ class App extends React.Component {
                     labels,
                     values: labels.map(e => document[e.name]),
                     collection: database.collection,
-                    collectionList: database.all_collections,
+                    collectionList: database.all_collections.filter(e => !e.match(/_logs/)),
                 });
             })
             .catch((err) => {
@@ -256,7 +256,7 @@ class App extends React.Component {
                         index: Number.isNaN(parseInt(e.target.value, 0))
                             ? '' : parseInt(e.target.value, 0),
                     })}
-                    onCollectionChange={e => console.log(e)}
+                    onCollectionChange={e => console.log(e.target.value)}
                     index={index}
                     total={total}
                     previousButton={this.previousButton}

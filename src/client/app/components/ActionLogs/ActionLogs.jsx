@@ -33,7 +33,7 @@ function ActionLogs(props) {
     } = props;
 
     return (
-        <LogsModal onClick={e => e.stopPropagation()}>
+        <LogsModal>
             <table>
                 <tbody>
                     <tr>

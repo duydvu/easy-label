@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Button from '../Button';
 import ActionLogs from '../ActionLogs';
+import Modal from '../Modal';
 
 const NavigationContainer = styled.div`
     position: fixed;
@@ -78,16 +79,6 @@ const SideNavToggleButton = styled(Button)`
             margin-bottom: 2px;
         }
     }
-`;
-
-const BackgroundLayer = styled.div`
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.75);
-    visibility: ${props => (props.show ? 'visible' : 'hidden')};
 `;
 
 const SideNav = styled.div`
@@ -214,9 +205,9 @@ export default class Navigation extends React.Component {
                     <div />
                     <div />
                 </SideNavToggleButton>
-                <BackgroundLayer
-                    show={showNav}
-                    onClick={() => this.setState({ showNav: false })}
+                <Modal
+                    isShow={showNav}
+                    onClose={() => this.setState({ showNav: false })}
                 >
                     <SideNav show={showNav} onClick={e => e.stopPropagation()}>
                         <SideNavItem>
@@ -261,10 +252,10 @@ export default class Navigation extends React.Component {
                             </Button>
                         </SideNavItem>
                     </SideNav>
-                </BackgroundLayer>
-                <BackgroundLayer show={showLogs} onClick={() => this.setState({ showLogs: false })}>
+                </Modal>
+                <Modal isShow={showLogs} onClose={() => this.setState({ showLogs: false })}>
                     <ActionLogs />
-                </BackgroundLayer>
+                </Modal>
             </NavigationContainer>
         );
     }
