@@ -50,10 +50,27 @@ export default function LabelsCollection(props) {
             <LabelHeader className="bold">{props.name}</LabelHeader>
             <div>
                 {
-                    values.map(e => (
+                    values.map((e, i) => (
                         <LabelButton
                             key={e}
                             onClick={() => props.onClick(e)}
+                            onKeyDown={(evt) => {
+                                switch (evt.keyCode) {
+                                    // Arrow Up
+                                    case 38:
+                                        if (evt.target.previousSibling) {
+                                            evt.target.previousSibling.focus();
+                                        }
+                                        break;
+                                    // Arrow Down
+                                    case 40:
+                                        if (evt.target.nextSibling) {
+                                            evt.target.nextSibling.focus();
+                                        }
+                                        break;
+                                    default:
+                                }
+                            }}
                             className={props.value === e && 'active'}
                         >
                             {JSON.stringify(e)}

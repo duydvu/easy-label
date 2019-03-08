@@ -19,17 +19,40 @@ const LogsModal = styled.div`
     }
     th {
         background: #dddddd;
-        padding: 10px 0;
     }
     td, th {
         border: 1px solid #dddddd;
         text-align: center;
+        padding: 10px 0;
+    }
+    .header {
+        text-transform: capitalize;
     }
 `;
+
+function LabelColumns(props) {
+    const {
+        labels,
+        detail,
+    } = props;
+
+    return labels.map((e) => {
+        switch (e.type) {
+            case 'boolean':
+                return (
+                    <td key={e.name}>{detail[e.name].toString()}</td>
+                );
+            default:
+                alert('Unknown label type');
+                return null;
+        }
+    });
+}
 
 function ActionLogs(props) {
     const {
         logs,
+        labels,
     } = props;
 
     return (
@@ -37,18 +60,24 @@ function ActionLogs(props) {
             <table>
                 <tbody>
                     <tr>
+                        <th />
                         <th>Action</th>
                         <th>Index</th>
                         <th>Date</th>
-                        <th>Data</th>
+                        {
+                            labels.map(e => (
+                                <th key={e.name} className="header">{e.name}</th>
+                            ))
+                        }
                     </tr>
                     {
                         logs.map((e, i) => (
-                            <tr key={i}>
+                            <tr key={new Date(e.date.$date).toString()}>
+                                <td>{i + 1}</td>
                                 <td>{e.action}</td>
                                 <td>{e.index}</td>
                                 <td>{new Date(e.date.$date).toLocaleString()}</td>
-                                <td>{JSON.stringify(e.detail)}</td>
+                                <LabelColumns labels={labels} detail={e.detail} />
                             </tr>
                         ))
                     }
@@ -59,6 +88,14 @@ function ActionLogs(props) {
 }
 
 export default connect(
-    state => ({ logs: state.logs }),
+    (state) => {
+        const {
+            labels,
+        } = state.metadata;
+        return {
+            labels,
+            logs: state.logs,
+        };
+    },
     () => ({}),
 )(ActionLogs);

@@ -8,6 +8,7 @@ import Navigation from '../Navigation';
 import {
     addOneLog,
     addMulLogs,
+    initMetadata,
 } from '../../redux/action';
 
 const AppContainer = styled.div`
@@ -64,14 +65,10 @@ class App extends React.Component {
         }
 
         this.state = {
-            document: null,
+            document: {},
             index: parseInt(query.i, 0) || 0,
-            total: 0,
-            columns: [],
-            labels: [],
             values: [],
             collection: '',
-            collectionList: [],
             changed: false,
             error: {
                 code: 0,
@@ -103,18 +100,20 @@ class App extends React.Component {
             .then(([document, { database, labels }]) => {
                 window.history.replaceState({ index }, `Document #${index}`, `/?i=${index}`);
                 this.props.addMulLogs(database.logs);
-                this.setState({
-                    document,
-                    total: database.count,
-                    columns: database.keys.filter(e => (
+                this.props.initMetadata(
+                    database.count,
+                    database.keys.filter(e => (
                         e !== '_id'
                         && e !== 'index'
                         && !labels.map(l => l.name).includes(e)
                     )),
                     labels,
+                    database.all_collections.filter(e => !e.match(/_logs/)),
+                );
+                this.setState({
+                    document,
                     values: labels.map(e => document[e.name]),
                     collection: database.collection,
-                    collectionList: database.all_collections.filter(e => !e.match(/_logs/)),
                 });
             })
             .catch((err) => {
@@ -162,7 +161,7 @@ class App extends React.Component {
             const body = {};
             const saveIndex = this.state.index;
             keys.forEach((k) => {
-                body[this.state.labels[k].name] = this.state.values[k];
+                body[this.props.labels[k].name] = this.state.values[k];
             });
             fetch(`${API_URL}${this.urls[0](saveIndex)}`, {
                 method: 'PUT',
@@ -188,16 +187,16 @@ class App extends React.Component {
         fetch(`${API_URL}${this.urls[0](index)}`).then(res => res.json())
             .then((document) => {
                 window.history[replace ? 'replaceState' : 'pushState']({ index }, `Document #${index}`, `/?i=${index}`);
-                this.setState(prevState => ({
+                this.setState({
                     document,
                     index,
-                    values: prevState.labels.map(e => document[e.name]),
+                    values: this.props.labels.map(e => document[e.name]),
                     changed: false,
                     error: {
                         code: 0,
                         msg: null,
                     },
-                }));
+                });
             })
             .catch(() => {
                 this.setState({
@@ -238,14 +237,17 @@ class App extends React.Component {
         const {
             document,
             index,
+            values,
+            collection,
+            error,
+        } = this.state;
+
+        const {
             total,
             columns,
             labels,
-            values,
-            collection,
             collectionList,
-            error,
-        } = this.state;
+        } = this.props;
 
         return (
             <AppContainer>
@@ -318,9 +320,25 @@ class App extends React.Component {
 }
 
 export default connect(
-    () => ({}),
+    (state) => {
+        const {
+            total,
+            columns,
+            labels,
+            collectionList,
+        } = state.metadata;
+        return {
+            total,
+            columns,
+            labels,
+            collectionList,
+        };
+    },
     dispatch => ({
         addOneLog: log => dispatch(addOneLog(log)),
         addMulLogs: logs => dispatch(addMulLogs(logs)),
+        initMetadata: (total, columns, labels, collectionList) => (
+            dispatch(initMetadata(total, columns, labels, collectionList))
+        ),
     }),
 )(App);
