@@ -8,7 +8,7 @@
     "test": "jest --config ./configs/jest.config.js",
     "build": "node scripts/build.js",
     "node": "node scripts/node.js",
-    "new-component": "node scripts/new-component"
+    "new-component": "node scripts/new-component/index.js"
   },
   "license": "GPL-3.0",
   "dependencies": {

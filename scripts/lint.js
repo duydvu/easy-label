@@ -2,6 +2,9 @@ const { CLIEngine } = require('eslint');
 const fs = require('fs');
 const path = require('path');
 const opn = require('opn');
+const {
+    errorHandler,
+} = require('./utils');
 
 const cli = new CLIEngine({
     configFile: path.resolve(__dirname, '../configs/.eslintrc.js'),
@@ -15,8 +18,7 @@ const outputPath = path.resolve(__dirname, '../dist/lint-report.html');
 
 fs.writeFile(outputPath, formatter(report.results), (err) => {
     if (err) {
-        console.error(err);
-        return;
+        errorHandler(err);
     }
     console.log(`Lint report is at ${outputPath}.`);
     opn(outputPath);

@@ -5,6 +5,9 @@ const async = require('async');
 const clientConfig = require('../configs/webpack.config');
 const serverConfig = require('../configs/webpack.server.config');
 const constants = require('../configs/constants');
+const {
+    errorHandler,
+} = require('./utils');
 
 const clientCompiler = webpack(clientConfig);
 const serverCompiler = webpack(serverConfig);
@@ -45,6 +48,6 @@ async.series([
     },
 ], (err) => {
     if (err) {
-        console.error(err);
+        errorHandler(err);
     }
 });
