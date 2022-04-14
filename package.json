@@ -12,7 +12,7 @@
   },
   "license": "GPL-3.0",
   "dependencies": {
-    "async": "^2.6.0",
+    "async": "^3.2.2",
     "axios": "^0.18.1",
     "chalk": "^2.4.1",
     "csvtojson": "^2.0.8",
